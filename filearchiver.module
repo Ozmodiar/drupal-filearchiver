@@ -1,0 +1,34 @@
+<?php
+
+/**
+ * Implements hook_form_alter().
+ */
+function filearchiver_form_alter(&$form, $form_state, $form_id) {
+  if ($form_id == 'page_node_form') {
+    $form['#submit'][] = '_filearchiver_submit_handler';
+  }
+}
+
+/**
+ * Get file from field_file, archive and store in specific folder.
+ */
+function _filearchiver_submit_handler($form, &$form_state) {
+  // Delete an already existing archive with the same name.
+  $realpath = drupal_realpath('public://') . '/archives/filename.zip';
+  if (file_exists($realpath)) {
+    unlink($realpath);
+  }
+
+  $file_path = variable_get('file_private_path', conf_path() . '/files');
+  $archive_path = $file_path . '/archives/filename.zip';
+  $archive = new ZipArchive();
+  $res = $archive->open($archive_path, ZipArchive::CREATE);
+  if ($res === TRUE) {
+    $fid = $form_state['values']['field_file'][$form['field_file']['#language']][0]['fid'];
+    $file = file_load($fid);
+    if (!$archive->addFile(drupal_realpath($file->uri), $file->filename)) {
+      watchdog('filearchiver', $file->uri . ' was not added to the archive');
+    }
+    $archive->close();
+  }
+}
