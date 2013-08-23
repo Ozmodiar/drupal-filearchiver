@@ -3,3 +3,4 @@ description = "Generate archives for files connected to nodes."
 core = "7.x"
 package = "Other"
 version = "7.x-1.0-dev"
+dependencies[] = file
