@@ -111,7 +111,7 @@ function theme_filearchiver_formatter_table($variables) {
     );
   }
   $rows[] = array(
-    'zip',
+    t('Download all files at once'), //@todo: make this text configurable.
     '1337 KB',
   );
 
